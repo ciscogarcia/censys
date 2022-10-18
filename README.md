@@ -22,7 +22,18 @@
 >    Please choose one of these programming languages for implementation: golang, python, java, scala.
 
 ## Running services
-```make docker``` will build the docker images and start them running.
+```make docker``` will build the docker image and start it running.
 
-### Running test
-```./test_service.sh``` will run a suite of tests that test insertion, deletion and overwriting data. It will make a simple api call to the test service that triggers the running of tests against the KV service.
+## Running tests
+```curl http://localhost:10000/test``` will run a suite of tests that test insertion, deletion and overwriting data. It will make a simple api call to the test service that triggers the running of tests against the KV service.
+
+The responses will be output to STDOUT, 1 JSON message per test as defined in test_service.go
+
+Manual tests can also be run with curl
+``` curl -X POST http://localhost:10000/kv -d '{"key": "name", "value": "cisco"}'```
+``` curl -X PUT http://localhost:10000/kv -d '{"key": "name", "value": "john"}'```
+``` curl -X GET 'http://localhost:10000/kv?key=name'```
+``` curl -X DELETE http://localhost:10000/kv -d '{"key": "name"}'```
+
+## Notes
+There is a (purposeful) discrepancy while handling responses from the KV service. In the case of an error, we are returning a hand-rolled JSON payload. This is due to the fact that one of the failure cases is Marshaling our JSON responses, and that would taint the error returned to the client. In order to account for this and be consitant across all errors, I have made the decision to hand-roll a simple json error in case of errors.
